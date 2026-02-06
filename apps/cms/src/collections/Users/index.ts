@@ -3,11 +3,15 @@ import { assignAdminToFirstUser } from "./hooks/beforeChange.hooks";
 
 const isAdmin: Access = ({ req: { user } }) => user?.role === "admin";
 
-const isAdminFieldLevel: FieldAccess = ({ req: { user } }) => user?.role === "admin";
+const isAdminFieldLevel: FieldAccess = ({ req: { user } }) =>
+  user?.role === "admin";
 
 const Users: CollectionConfig = {
   slug: "users",
-  admin: {},
+  admin: {
+    defaultColumns: ["fullName", "role", "createdAt", "updatedAt"],
+    useAsTitle: "fullName",
+  },
   auth: {
     disableLocalStrategy: true,
   },
@@ -18,6 +22,7 @@ const Users: CollectionConfig = {
     {
       name: "id",
       admin: {
+        hidden: true,
         readOnly: true,
       },
       required: true,
@@ -46,12 +51,32 @@ const Users: CollectionConfig = {
       type: "select",
     },
     {
-      name: "first_name",
+      name: "fullName",
+      label: "Full Name",
+      type: "text",
+      admin: {
+        readOnly: true,
+      },
+      hooks: {
+        beforeChange: [
+          ({ siblingData }) => {
+            delete siblingData.fullName;
+          },
+        ],
+        afterRead: [
+          ({ siblingData }) => {
+            return `${siblingData.firstName ?? ""} ${siblingData.lastName ?? ""}`.trim();
+          },
+        ],
+      },
+    },
+    {
+      name: "firstName",
       label: "First Name",
       type: "text",
     },
     {
-      name: "last_name",
+      name: "lastName",
       label: "Last Name",
       type: "text",
     },

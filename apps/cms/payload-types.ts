@@ -119,8 +119,9 @@ export interface UserAuthOperations {
 export interface User {
   id: string;
   role: 'admin' | 'user';
-  first_name?: string | null;
-  last_name?: string | null;
+  fullName?: string | null;
+  firstName?: string | null;
+  lastName?: string | null;
   updatedAt: string;
   createdAt: string;
   collection: 'users';
@@ -201,8 +202,9 @@ export interface PayloadMigration {
 export interface UsersSelect<T extends boolean = true> {
   id?: T;
   role?: T;
-  first_name?: T;
-  last_name?: T;
+  fullName?: T;
+  firstName?: T;
+  lastName?: T;
   updatedAt?: T;
   createdAt?: T;
 }

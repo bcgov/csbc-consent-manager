@@ -20,8 +20,8 @@ export const keycloakPlugin = OAuth2Plugin({
 
     return {
       id: user.sub,
-      first_name: user.given_name,
-      last_name: user.family_name,
+      firstName: user.given_name,
+      lastName: user.family_name,
       role,
     };
   },
