@@ -67,14 +67,25 @@ export interface Config {
   };
   blocks: {};
   collections: {
+    contributors: Contributor;
+    documents: Document;
+    versions: Version;
     users: User;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
     'payload-preferences': PayloadPreference;
     'payload-migrations': PayloadMigration;
   };
-  collectionsJoins: {};
+  collectionsJoins: {
+    documents: {
+      versions: 'versions';
+      contributors: 'contributors';
+    };
+  };
   collectionsSelect: {
+    contributors: ContributorsSelect<false> | ContributorsSelect<true>;
+    documents: DocumentsSelect<false> | DocumentsSelect<true>;
+    versions: VersionsSelect<false> | VersionsSelect<true>;
     users: UsersSelect<false> | UsersSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
@@ -114,6 +125,70 @@ export interface UserAuthOperations {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "contributors".
+ */
+export interface Contributor {
+  id: string;
+  document: string | Document;
+  user: string | User;
+  role: 'owner' | 'editor' | 'viewer';
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "documents".
+ */
+export interface Document {
+  id: string;
+  name: string;
+  description?: string | null;
+  organizationId?: string | null;
+  publishedVersion?: (string | null) | Version;
+  versions?: {
+    docs?: (string | Version)[];
+    hasNextPage?: boolean;
+    totalDocs?: number;
+  };
+  contributors?: {
+    docs?: (string | Contributor)[];
+    hasNextPage?: boolean;
+    totalDocs?: number;
+  };
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "versions".
+ */
+export interface Version {
+  id: string;
+  document: string | Document;
+  status?: ('draft' | 'published' | 'archived') | null;
+  version?: number | null;
+  content?: {
+    root: {
+      type: string;
+      children: {
+        type: any;
+        version: number;
+        [k: string]: unknown;
+      }[];
+      direction: ('ltr' | 'rtl') | null;
+      format: 'left' | 'start' | 'center' | 'right' | 'end' | 'justify' | '';
+      indent: number;
+      version: number;
+    };
+    [k: string]: unknown;
+  } | null;
+  publishedAt?: string | null;
+  archivedAt?: string | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "users".
  */
 export interface User {
@@ -149,10 +224,23 @@ export interface PayloadKv {
  */
 export interface PayloadLockedDocument {
   id: number;
-  document?: {
-    relationTo: 'users';
-    value: string | User;
-  } | null;
+  document?:
+    | ({
+        relationTo: 'contributors';
+        value: string | Contributor;
+      } | null)
+    | ({
+        relationTo: 'documents';
+        value: string | Document;
+      } | null)
+    | ({
+        relationTo: 'versions';
+        value: string | Version;
+      } | null)
+    | ({
+        relationTo: 'users';
+        value: string | User;
+      } | null);
   globalSlug?: string | null;
   user: {
     relationTo: 'users';
@@ -194,6 +282,48 @@ export interface PayloadMigration {
   batch?: number | null;
   updatedAt: string;
   createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "contributors_select".
+ */
+export interface ContributorsSelect<T extends boolean = true> {
+  id?: T;
+  document?: T;
+  user?: T;
+  role?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "documents_select".
+ */
+export interface DocumentsSelect<T extends boolean = true> {
+  id?: T;
+  name?: T;
+  description?: T;
+  organizationId?: T;
+  publishedVersion?: T;
+  versions?: T;
+  contributors?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "versions_select".
+ */
+export interface VersionsSelect<T extends boolean = true> {
+  id?: T;
+  document?: T;
+  status?: T;
+  version?: T;
+  content?: T;
+  publishedAt?: T;
+  archivedAt?: T;
+  updatedAt?: T;
+  createdAt?: T;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
