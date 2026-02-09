@@ -15,11 +15,30 @@ const Versions: CollectionConfig = {
       "updatedAt",
     ],
     // hidden: true,
+    components: {
+      edit: {
+        beforeDocumentControls: [
+          "./src/components/VersionBadge.tsx#VersionBadge",
+          "./src/components/StatusBadge.tsx#StatusBadge",
+          "./src/components/ArchiveButton.tsx#ArchiveButton",
+          "./src/components/PublishButton.tsx#PublishButton",
+        ],
+      },
+    },
   },
   hooks: {
     beforeChange: [assignVersionNumber, deriveStatus],
   },
   fields: [
+    {
+      name: "formLock",
+      type: "ui",
+      admin: {
+        components: {
+          Field: "./src/components/FormLock.tsx#FormLock",
+        },
+      },
+    },
     {
       name: "id",
       type: "text",
@@ -51,7 +70,7 @@ const Versions: CollectionConfig = {
       ],
       defaultValue: "draft",
       admin: {
-        readOnly: true,
+        hidden: true,
       },
     },
     {
@@ -59,7 +78,7 @@ const Versions: CollectionConfig = {
       label: "Version",
       type: "number",
       admin: {
-        readOnly: true,
+        hidden: true,
       },
     },
     {
