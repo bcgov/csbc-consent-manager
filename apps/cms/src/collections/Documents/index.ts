@@ -1,5 +1,10 @@
 import { randomUUID } from "crypto";
-import { CollectionAfterChangeHook, CollectionConfig } from "payload";
+import {
+  APIError,
+  CollectionAfterChangeHook,
+  CollectionBeforeDeleteHook,
+  CollectionConfig,
+} from "payload";
 
 const addOwnerContributor: CollectionAfterChangeHook = async ({
   doc,
@@ -20,6 +25,53 @@ const addOwnerContributor: CollectionAfterChangeHook = async ({
   return doc;
 };
 
+const createInitialVersion: CollectionAfterChangeHook = async ({
+  doc,
+  operation,
+  req,
+}) => {
+  if (operation === "create") {
+    await req.payload.create({
+      collection: "versions",
+      data: {
+        document: doc.id,
+      },
+      req,
+    });
+  }
+  return doc;
+};
+
+const deleteRelatedDocs: CollectionBeforeDeleteHook = async ({ id, req }) => {
+  const statements = await req.payload.find({
+    collection: "statements",
+    where: { document: { equals: id } },
+    limit: 1,
+    req,
+  });
+
+  if (statements.totalDocs > 0) {
+    throw new APIError(
+      "Cannot delete a document that has consent statements. Remove all statements first.",
+      400,
+    );
+  }
+
+  const [contributors, versions] = await Promise.all([
+    req.payload.find({ collection: "contributors", where: { document: { equals: id } }, limit: 0, req }),
+    req.payload.find({ collection: "versions", where: { document: { equals: id } }, limit: 0, req }),
+  ]);
+
+  await Promise.all([
+    ...contributors.docs.map((doc) =>
+      req.payload.delete({ collection: "contributors", id: doc.id, req }),
+    ),
+    ...versions.docs.map((doc) =>
+      req.payload.delete({ collection: "versions", id: doc.id, req }),
+    ),
+  ]);
+};
+
 const Documents: CollectionConfig = {
   slug: "documents",
   admin: {
@@ -27,7 +79,8 @@ const Documents: CollectionConfig = {
     useAsTitle: "name",
   },
   hooks: {
-    afterChange: [addOwnerContributor],
+    afterChange: [addOwnerContributor, createInitialVersion],
+    beforeDelete: [deleteRelatedDocs],
   },
   fields: [
     {
@@ -41,6 +94,25 @@ const Documents: CollectionConfig = {
       },
     },
     {
+      name: "organizationId",
+      label: "Organization",
+      type: "text",
+      required: true,
+      admin: {
+        components: {
+          Field:
+            "./src/components/fields/OrganizationSelect.tsx#OrganizationSelect",
+        },
+      },
+    },
+    {
+      name: "documentType",
+      label: "Document Type",
+      type: "relationship",
+      relationTo: "document-types",
+      required: true,
+    },
+    {
       name: "name",
       label: "Name",
       type: "text",
@@ -52,23 +124,13 @@ const Documents: CollectionConfig = {
       type: "textarea",
     },
     {
-      name: "organizationId",
-      label: "Organization",
-      type: "text",
-      admin: {
-        components: {
-          Field:
-            "./src/components/fields/OrganizationSelect.tsx#OrganizationSelect",
-        },
-      },
-    },
-    {
       name: "publishedVersion",
       label: "Published Version",
       type: "relationship",
       relationTo: "versions",
       admin: {
         readOnly: true,
+        condition: (data) => Boolean(data?.id),
       },
     },
     {

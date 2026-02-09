@@ -16,7 +16,7 @@ export const assignVersionNumber: CollectionBeforeChangeHook = async ({
     limit: 1,
   });
 
-  data.version = existing.totalDocs > 0 ? existing.docs[0].version + 1 : 1;
+  data.version = existing.totalDocs > 0 ? (existing.docs[0].version ?? 0) + 1 : 1;
 
   return data;
 };

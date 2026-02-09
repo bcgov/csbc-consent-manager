@@ -1,4 +1,5 @@
 import { OrganizationSelect as OrganizationSelect_c75e7132eb53d214b6db81e1466cc7a2 } from '../../../../src/components/fields/OrganizationSelect.tsx'
+import { SlugFromName as SlugFromName_07a3dc3e6452e55d4910d259f62a2cc9 } from '../../../../src/components/fields/SlugFromName.tsx'
 import { FormLock as FormLock_1be952e2a801c23576c809f31860f3b1 } from '../../../../src/components/FormLock.tsx'
 import { RscEntryLexicalCell as RscEntryLexicalCell_44fe37237e0ebf4470c9990d8cb7b07e } from '@payloadcms/richtext-lexical/rsc'
 import { RscEntryLexicalField as RscEntryLexicalField_44fe37237e0ebf4470c9990d8cb7b07e } from '@payloadcms/richtext-lexical/rsc'
@@ -27,11 +28,13 @@ import { VersionBadge as VersionBadge_d8e3a88465738b3a26833b8dfb56bfaa } from '.
 import { StatusBadge as StatusBadge_498e21874c6406ff8b8696f9cf4b8cb8 } from '../../../../src/components/StatusBadge.tsx'
 import { ArchiveButton as ArchiveButton_cb2dcfe77385d72165d47b88be9e8338 } from '../../../../src/components/ArchiveButton.tsx'
 import { PublishButton as PublishButton_1f6065e4c76f83eb09744ef74688205d } from '../../../../src/components/PublishButton.tsx'
+import { CreateNewVersionMenuItem as CreateNewVersionMenuItem_1a36eb189e8057d9bfedf66ef69cbd1c } from '../../../../src/components/CreateNewVersionMenuItem.tsx'
 import { KeycloakLoginButton as KeycloakLoginButton_ae2b770935e451e90bd6e9b053b86501 } from '../../../../src/plugins/keycloak/components/keycloak-login-button.component.tsx'
 import { CollectionCards as CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1 } from '@payloadcms/next/rsc'
 
 export const importMap = {
   "./src/components/fields/OrganizationSelect.tsx#OrganizationSelect": OrganizationSelect_c75e7132eb53d214b6db81e1466cc7a2,
+  "./src/components/fields/SlugFromName.tsx#SlugFromName": SlugFromName_07a3dc3e6452e55d4910d259f62a2cc9,
   "./src/components/FormLock.tsx#FormLock": FormLock_1be952e2a801c23576c809f31860f3b1,
   "@payloadcms/richtext-lexical/rsc#RscEntryLexicalCell": RscEntryLexicalCell_44fe37237e0ebf4470c9990d8cb7b07e,
   "@payloadcms/richtext-lexical/rsc#RscEntryLexicalField": RscEntryLexicalField_44fe37237e0ebf4470c9990d8cb7b07e,
@@ -60,6 +63,7 @@ export const importMap = {
   "./src/components/StatusBadge.tsx#StatusBadge": StatusBadge_498e21874c6406ff8b8696f9cf4b8cb8,
   "./src/components/ArchiveButton.tsx#ArchiveButton": ArchiveButton_cb2dcfe77385d72165d47b88be9e8338,
   "./src/components/PublishButton.tsx#PublishButton": PublishButton_1f6065e4c76f83eb09744ef74688205d,
+  "./src/components/CreateNewVersionMenuItem.tsx#CreateNewVersionMenuItem": CreateNewVersionMenuItem_1a36eb189e8057d9bfedf66ef69cbd1c,
   "./src/plugins/keycloak/components/keycloak-login-button.component.tsx#KeycloakLoginButton": KeycloakLoginButton_ae2b770935e451e90bd6e9b053b86501,
   "@payloadcms/next/rsc#CollectionCards": CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1
 }

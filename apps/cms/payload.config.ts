@@ -6,6 +6,9 @@ import sharp from "sharp";
 import { fileURLToPath } from "url";
 import Contributors from "./src/collections/Contributors";
 import Documents from "./src/collections/Documents";
+import DocumentTypes from "./src/collections/DocumentTypes";
+import Statements from "./src/collections/Statements";
+import Subjects from "./src/collections/Subjects";
 import Users from "./src/collections/Users";
 import Versions from "./src/collections/Versions";
 import { keycloakPlugin } from "./src/plugins/keycloak/keycloak.plugin";
@@ -26,7 +29,15 @@ export default buildConfig({
     },
     user: Users.slug,
   },
-  collections: [Contributors, Documents, Users, Versions],
+  collections: [
+    Contributors,
+    Documents,
+    DocumentTypes,
+    Versions,
+    Statements,
+    Subjects,
+    Users,
+  ],
   db: postgresAdapter({
     pool: {
       connectionString: process.env.DATABASE_URI || "",

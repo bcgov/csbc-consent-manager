@@ -4,6 +4,7 @@ import { generateId } from "./hooks/beforeValidate.hooks";
 
 const Versions: CollectionConfig = {
   slug: "versions",
+  disableDuplicate: true,
   admin: {
     defaultColumns: [
       "document",
@@ -14,7 +15,7 @@ const Versions: CollectionConfig = {
       "createdAt",
       "updatedAt",
     ],
-    // hidden: true,
+    hidden: true,
     components: {
       edit: {
         beforeDocumentControls: [
@@ -23,11 +24,18 @@ const Versions: CollectionConfig = {
           "./src/components/ArchiveButton.tsx#ArchiveButton",
           "./src/components/PublishButton.tsx#PublishButton",
         ],
+        editMenuItems: [
+          "./src/components/CreateNewVersionMenuItem.tsx#CreateNewVersionMenuItem",
+        ],
       },
     },
   },
   hooks: {
     beforeChange: [assignVersionNumber, deriveStatus],
+  },
+  labels: {
+    singular: "Document Version",
+    plural: "Document Versions",
   },
   fields: [
     {
@@ -85,6 +93,7 @@ const Versions: CollectionConfig = {
       name: "content",
       label: "Content",
       type: "richText",
+      required: true,
     },
     {
       name: "publishedAt",

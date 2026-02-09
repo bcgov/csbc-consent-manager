@@ -69,7 +69,10 @@ export interface Config {
   collections: {
     contributors: Contributor;
     documents: Document;
+    'document-types': DocumentType;
     versions: Version;
+    statements: Statement;
+    subjects: Subject;
     users: User;
     'payload-kv': PayloadKv;
     'payload-locked-documents': PayloadLockedDocument;
@@ -85,7 +88,10 @@ export interface Config {
   collectionsSelect: {
     contributors: ContributorsSelect<false> | ContributorsSelect<true>;
     documents: DocumentsSelect<false> | DocumentsSelect<true>;
+    'document-types': DocumentTypesSelect<false> | DocumentTypesSelect<true>;
     versions: VersionsSelect<false> | VersionsSelect<true>;
+    statements: StatementsSelect<false> | StatementsSelect<true>;
+    subjects: SubjectsSelect<false> | SubjectsSelect<true>;
     users: UsersSelect<false> | UsersSelect<true>;
     'payload-kv': PayloadKvSelect<false> | PayloadKvSelect<true>;
     'payload-locked-documents': PayloadLockedDocumentsSelect<false> | PayloadLockedDocumentsSelect<true>;
@@ -141,9 +147,10 @@ export interface Contributor {
  */
 export interface Document {
   id: string;
+  organizationId: string;
+  documentType: string | DocumentType;
   name: string;
   description?: string | null;
-  organizationId?: string | null;
   publishedVersion?: (string | null) | Version;
   versions?: {
     docs?: (string | Version)[];
@@ -160,6 +167,18 @@ export interface Document {
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "document-types".
+ */
+export interface DocumentType {
+  id: string;
+  name: string;
+  description?: string | null;
+  enabled?: boolean | null;
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
  * via the `definition` "versions".
  */
 export interface Version {
@@ -167,7 +186,7 @@ export interface Version {
   document: string | Document;
   status?: ('draft' | 'published' | 'archived') | null;
   version?: number | null;
-  content?: {
+  content: {
     root: {
       type: string;
       children: {
@@ -181,7 +200,7 @@ export interface Version {
       version: number;
     };
     [k: string]: unknown;
-  } | null;
+  };
   publishedAt?: string | null;
   archivedAt?: string | null;
   updatedAt: string;
@@ -200,6 +219,31 @@ export interface User {
   updatedAt: string;
   createdAt: string;
   collection: 'users';
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "statements".
+ */
+export interface Statement {
+  id: string;
+  document: string | Document;
+  subject: string | Subject;
+  version: string | Version;
+  status: 'granted' | 'denied';
+  updatedAt: string;
+  createdAt: string;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "subjects".
+ */
+export interface Subject {
+  id: string;
+  email?: string | null;
+  firstName?: string | null;
+  lastName?: string | null;
+  updatedAt: string;
+  createdAt: string;
 }
 /**
  * This interface was referenced by `Config`'s JSON-Schema
@@ -234,8 +278,20 @@ export interface PayloadLockedDocument {
         value: string | Document;
       } | null)
     | ({
+        relationTo: 'document-types';
+        value: string | DocumentType;
+      } | null)
+    | ({
         relationTo: 'versions';
         value: string | Version;
+      } | null)
+    | ({
+        relationTo: 'statements';
+        value: string | Statement;
+      } | null)
+    | ({
+        relationTo: 'subjects';
+        value: string | Subject;
       } | null)
     | ({
         relationTo: 'users';
@@ -301,12 +357,25 @@ export interface ContributorsSelect<T extends boolean = true> {
  */
 export interface DocumentsSelect<T extends boolean = true> {
   id?: T;
+  organizationId?: T;
+  documentType?: T;
   name?: T;
   description?: T;
-  organizationId?: T;
   publishedVersion?: T;
   versions?: T;
   contributors?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "document-types_select".
+ */
+export interface DocumentTypesSelect<T extends boolean = true> {
+  id?: T;
+  name?: T;
+  description?: T;
+  enabled?: T;
   updatedAt?: T;
   createdAt?: T;
 }
@@ -322,6 +391,31 @@ export interface VersionsSelect<T extends boolean = true> {
   content?: T;
   publishedAt?: T;
   archivedAt?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "statements_select".
+ */
+export interface StatementsSelect<T extends boolean = true> {
+  id?: T;
+  document?: T;
+  subject?: T;
+  version?: T;
+  status?: T;
+  updatedAt?: T;
+  createdAt?: T;
+}
+/**
+ * This interface was referenced by `Config`'s JSON-Schema
+ * via the `definition` "subjects_select".
+ */
+export interface SubjectsSelect<T extends boolean = true> {
+  id?: T;
+  email?: T;
+  firstName?: T;
+  lastName?: T;
   updatedAt?: T;
   createdAt?: T;
 }
