@@ -1,15 +1,24 @@
 "use client";
 
-import { useDocumentInfo, useField } from "@payloadcms/ui";
+import {
+  ConfirmationModal,
+  useDocumentInfo,
+  useField,
+  useFormModified,
+  useModal,
+} from "@payloadcms/ui";
 import { useCallback, useState } from "react";
+
+const ARCHIVE_MODAL_SLUG = "confirm-archive-version";
 
 export const ArchiveButton: React.FC = () => {
   const { id } = useDocumentInfo();
-  if (!id) return null;
   const { value: archivedAt } = useField<string>({ path: "archivedAt" });
   const { value: status } = useField<string>({ path: "status" });
   const { value: documentId } = useField<string>({ path: "document" });
+  const modified = useFormModified();
   const [loading, setLoading] = useState(false);
+  const { openModal } = useModal();
 
   const isArchived = Boolean(archivedAt);
   const isPublished = status === "published";
@@ -43,14 +52,31 @@ export const ArchiveButton: React.FC = () => {
     }
   }, [id, isArchived, documentId]);
 
+  if (!id || !isPublished || isArchived || modified) return null;
+
   return (
+    <>
     <button
       type="button"
-      className="btn btn--style-secondary btn--size-medium"
-      disabled={isArchived || !isPublished || loading || !id}
-      onClick={handleArchive}
+      className="btn btn--size-medium"
+      style={{
+        backgroundColor: loading ? undefined : "#dc2626",
+        color: loading ? undefined : "#ffffff",
+      }}
+      disabled={loading}
+      onClick={() => openModal(ARCHIVE_MODAL_SLUG)}
     >
       {loading ? "Archiving..." : "Archive"}
     </button>
+    <ConfirmationModal
+      modalSlug={ARCHIVE_MODAL_SLUG}
+      heading="Confirm Archive"
+      body="You are archiving this document version. Any services which rely on it will not display anything until a new version is published."
+      confirmLabel="Archive"
+      confirmingLabel="Archiving..."
+      cancelLabel="Cancel"
+      onConfirm={handleArchive}
+    />
+    </>
   );
 };

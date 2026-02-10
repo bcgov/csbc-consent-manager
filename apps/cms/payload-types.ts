@@ -186,7 +186,7 @@ export interface Version {
   document: string | Document;
   status?: ('draft' | 'published' | 'archived') | null;
   version?: number | null;
-  content: {
+  content?: {
     root: {
       type: string;
       children: {
@@ -200,6 +200,13 @@ export interface Version {
       version: number;
     };
     [k: string]: unknown;
+  } | null;
+  /**
+   * This text will be shown to end users next to the I accept, I decline options.
+   */
+  signOff?: {
+    accept?: string | null;
+    decline?: string | null;
   };
   publishedAt?: string | null;
   archivedAt?: string | null;
@@ -389,6 +396,12 @@ export interface VersionsSelect<T extends boolean = true> {
   status?: T;
   version?: T;
   content?: T;
+  signOff?:
+    | T
+    | {
+        accept?: T;
+        decline?: T;
+      };
   publishedAt?: T;
   archivedAt?: T;
   updatedAt?: T;

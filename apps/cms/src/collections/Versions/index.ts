@@ -23,6 +23,7 @@ const Versions: CollectionConfig = {
           "./src/components/StatusBadge.tsx#StatusBadge",
           "./src/components/ArchiveButton.tsx#ArchiveButton",
           "./src/components/PublishButton.tsx#PublishButton",
+          "./src/components/EditVersionButton.tsx#EditVersionButton",
         ],
         editMenuItems: [
           "./src/components/CreateNewVersionMenuItem.tsx#CreateNewVersionMenuItem",
@@ -93,7 +94,35 @@ const Versions: CollectionConfig = {
       name: "content",
       label: "Content",
       type: "richText",
-      required: true,
+    },
+    {
+      name: "signOff",
+      label: "Sign Off",
+      type: "group",
+      admin: {
+        description:
+          "This text will be shown to end users next to the I accept, I decline options.",
+      },
+      fields: [
+        {
+          name: "accept",
+          label: "Accept",
+          type: "text",
+          defaultValue: "I accept the terms outlined above.",
+          admin: {
+            placeholder: "I accept the terms outlined above.",
+          },
+        },
+        {
+          name: "decline",
+          label: "Decline",
+          type: "text",
+          defaultValue: "I decline the terms outlined above.",
+          admin: {
+            placeholder: "I decline the terms outlined above.",
+          },
+        },
+      ],
     },
     {
       name: "publishedAt",

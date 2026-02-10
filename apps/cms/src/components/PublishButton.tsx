@@ -4,6 +4,7 @@ import {
   ConfirmationModal,
   useDocumentInfo,
   useField,
+  useFormModified,
   useModal,
 } from "@payloadcms/ui";
 import { useCallback, useState } from "react";
@@ -12,14 +13,16 @@ const PUBLISH_MODAL_SLUG = "confirm-publish-version";
 
 export const PublishButton: React.FC = () => {
   const { id } = useDocumentInfo();
-  if (!id) return null;
   const { value: publishedAt } = useField<string>({ path: "publishedAt" });
   const { value: archivedAt } = useField<string>({ path: "archivedAt" });
   const { value: documentId } = useField<string>({ path: "document" });
+  const modified = useFormModified();
   const [loading, setLoading] = useState(false);
   const { openModal } = useModal();
 
   const isPublished = Boolean(publishedAt) && !Boolean(archivedAt);
+
+  if (!id || isPublished) return null;
 
   const handlePublish = useCallback(async () => {
     if (!id || !documentId) return;
@@ -81,8 +84,12 @@ export const PublishButton: React.FC = () => {
     <>
       <button
         type="button"
-        className="btn btn--style-primary btn--size-medium"
-        disabled={isPublished || loading || !id}
+        className="btn btn--size-medium"
+        style={{
+          backgroundColor: loading || modified ? undefined : "#16a34a",
+          color: loading || modified ? undefined : "#ffffff",
+        }}
+        disabled={loading || modified}
         onClick={handleClick}
       >
         {loading ? "Publishing..." : "Publish"}

@@ -28,6 +28,7 @@ import { VersionBadge as VersionBadge_d8e3a88465738b3a26833b8dfb56bfaa } from '.
 import { StatusBadge as StatusBadge_498e21874c6406ff8b8696f9cf4b8cb8 } from '../../../../src/components/StatusBadge.tsx'
 import { ArchiveButton as ArchiveButton_cb2dcfe77385d72165d47b88be9e8338 } from '../../../../src/components/ArchiveButton.tsx'
 import { PublishButton as PublishButton_1f6065e4c76f83eb09744ef74688205d } from '../../../../src/components/PublishButton.tsx'
+import { EditVersionButton as EditVersionButton_f1da477a51fbb7e2711885992b3c33e8 } from '../../../../src/components/EditVersionButton.tsx'
 import { CreateNewVersionMenuItem as CreateNewVersionMenuItem_1a36eb189e8057d9bfedf66ef69cbd1c } from '../../../../src/components/CreateNewVersionMenuItem.tsx'
 import { KeycloakLoginButton as KeycloakLoginButton_ae2b770935e451e90bd6e9b053b86501 } from '../../../../src/plugins/keycloak/components/keycloak-login-button.component.tsx'
 import { CollectionCards as CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1 } from '@payloadcms/next/rsc'
@@ -63,6 +64,7 @@ export const importMap = {
   "./src/components/StatusBadge.tsx#StatusBadge": StatusBadge_498e21874c6406ff8b8696f9cf4b8cb8,
   "./src/components/ArchiveButton.tsx#ArchiveButton": ArchiveButton_cb2dcfe77385d72165d47b88be9e8338,
   "./src/components/PublishButton.tsx#PublishButton": PublishButton_1f6065e4c76f83eb09744ef74688205d,
+  "./src/components/EditVersionButton.tsx#EditVersionButton": EditVersionButton_f1da477a51fbb7e2711885992b3c33e8,
   "./src/components/CreateNewVersionMenuItem.tsx#CreateNewVersionMenuItem": CreateNewVersionMenuItem_1a36eb189e8057d9bfedf66ef69cbd1c,
   "./src/plugins/keycloak/components/keycloak-login-button.component.tsx#KeycloakLoginButton": KeycloakLoginButton_ae2b770935e451e90bd6e9b053b86501,
   "@payloadcms/next/rsc#CollectionCards": CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1
