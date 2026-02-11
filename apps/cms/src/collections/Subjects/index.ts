@@ -4,10 +4,11 @@ const Subjects: CollectionConfig = {
   slug: "subjects",
   admin: {
     hidden: true,
+    useAsTitle: "fullName",
   },
   access: {
     create: () => false,
-    read: () => false,
+    read: ({ req }) => !!req.user,
     update: () => false,
     delete: () => false,
   },
@@ -22,6 +23,26 @@ const Subjects: CollectionConfig = {
       name: "email",
       label: "Email",
       type: "email",
+    },
+    {
+      name: "fullName",
+      label: "Full Name",
+      type: "text",
+      admin: {
+        hidden: true,
+      },
+      hooks: {
+        beforeChange: [
+          ({ siblingData }) => {
+            delete siblingData.fullName;
+          },
+        ],
+        afterRead: [
+          ({ siblingData }) => {
+            return `${siblingData.firstName ?? ""} ${siblingData.lastName ?? ""}`.trim();
+          },
+        ],
+      },
     },
     {
       name: "firstName",

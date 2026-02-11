@@ -202,12 +202,9 @@ export interface Version {
     [k: string]: unknown;
   } | null;
   /**
-   * This text will be shown to end users next to the I accept, I decline options.
+   * This text will be shown to end users next to the consent checkbox.
    */
-  signOff?: {
-    accept?: string | null;
-    decline?: string | null;
-  };
+  signOff?: string | null;
   publishedAt?: string | null;
   archivedAt?: string | null;
   updatedAt: string;
@@ -236,7 +233,7 @@ export interface Statement {
   document: string | Document;
   subject: string | Subject;
   version: string | Version;
-  status: 'granted' | 'denied';
+  status: 'granted' | 'revoked';
   updatedAt: string;
   createdAt: string;
 }
@@ -247,6 +244,7 @@ export interface Statement {
 export interface Subject {
   id: string;
   email?: string | null;
+  fullName?: string | null;
   firstName?: string | null;
   lastName?: string | null;
   updatedAt: string;
@@ -396,12 +394,7 @@ export interface VersionsSelect<T extends boolean = true> {
   status?: T;
   version?: T;
   content?: T;
-  signOff?:
-    | T
-    | {
-        accept?: T;
-        decline?: T;
-      };
+  signOff?: T;
   publishedAt?: T;
   archivedAt?: T;
   updatedAt?: T;
@@ -427,6 +420,7 @@ export interface StatementsSelect<T extends boolean = true> {
 export interface SubjectsSelect<T extends boolean = true> {
   id?: T;
   email?: T;
+  fullName?: T;
   firstName?: T;
   lastName?: T;
   updatedAt?: T;

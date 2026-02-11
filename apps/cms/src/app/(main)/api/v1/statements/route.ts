@@ -60,9 +60,9 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    if (status !== "granted" && status !== "denied") {
+    if (status !== "granted" && status !== "revoked") {
       return NextResponse.json(
-        { error: "Status must be 'granted' or 'denied'." },
+        { error: "Status must be 'granted' or 'revoked'." },
         { status: 400 },
       );
     }
@@ -81,7 +81,8 @@ export async function POST(req: NextRequest) {
       overrideAccess: true,
     });
 
-    return NextResponse.json(statement, { status: 201 });
+    const { document, ...rest } = statement;
+    return NextResponse.json(rest, { status: 201 });
   } catch (err: unknown) {
     const message = err instanceof Error ? err.message : "Internal server error.";
     const status = (err as { status?: number }).status ?? 500;
@@ -110,12 +111,22 @@ export async function GET(req: NextRequest) {
     const { searchParams } = new URL(req.url);
     const page = parseInt(searchParams.get("page") ?? "1", 10);
     const limit = parseInt(searchParams.get("limit") ?? "20", 10);
+    const documentId = searchParams.get("documentId");
+
+    const where: Record<string, unknown> = {
+      subject: { equals: subject.docs[0].id },
+    };
+
+    if (documentId) {
+      where.document = { equals: documentId };
+    }
 
     const statements = await payload.find({
       collection: "statements",
-      where: { subject: { equals: subject.docs[0].id } },
+      where,
       page,
       limit,
+      sort: "-createdAt",
       overrideAccess: true,
     });
 

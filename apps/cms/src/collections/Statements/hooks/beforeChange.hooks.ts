@@ -27,7 +27,9 @@ export const validateDocumentAndVersion: CollectionBeforeChangeHook = async ({
     throw new APIError("Version not found.", 404);
   }
 
-  if (version.document !== data!.document) {
+  const versionDocId = typeof version.document === "object" ? version.document.id : version.document;
+
+  if (versionDocId !== data!.document) {
     throw new APIError("Version does not belong to the specified document.", 400);
   }
 

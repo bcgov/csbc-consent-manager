@@ -1,7 +1,7 @@
+import { Version } from "@/payload-types";
+import config from "@payload-config";
 import { NextRequest, NextResponse } from "next/server";
 import { getPayload } from "payload";
-import config from "@payload-config";
-import { Document, Version } from "@/payload-types";
 
 export async function GET(
   _req: NextRequest,
@@ -56,9 +56,19 @@ export async function GET(
   } catch (err: unknown) {
     const status = (err as { status?: number }).status ?? 500;
     if (status === 404) {
-      return NextResponse.json({ error: "Document not found." }, { status: 404 });
+      return NextResponse.json(
+        { error: "Document not found." },
+        { status: 404 },
+      );
     }
-    const message = err instanceof Error ? err.message : "Internal server error.";
+    const message =
+      err instanceof Error ? err.message : "Internal server error.";
     return NextResponse.json({ error: message }, { status });
   }
 }
+
+export const OPTIONS = async (request: NextRequest) => {
+  return new NextResponse("", {
+    status: 200,
+  });
+};

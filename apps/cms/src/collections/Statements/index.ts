@@ -18,7 +18,9 @@ const isAdminOrContributor: Access = async ({ req }) => {
 
   if (contributions.docs.length === 0) return false;
 
-  const documentIds = contributions.docs.map((c) => c.document);
+  const documentIds = contributions.docs.map((c) =>
+    typeof c.document === "object" ? c.document.id : c.document,
+  );
 
   return {
     document: { in: documentIds },
@@ -82,7 +84,7 @@ const Statements: CollectionConfig = {
       required: true,
       options: [
         { label: "Granted", value: "granted" },
-        { label: "Denied", value: "denied" },
+        { label: "Revoked", value: "revoked" },
       ],
     },
   ],

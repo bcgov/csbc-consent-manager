@@ -16,6 +16,7 @@ const Versions: CollectionConfig = {
       "updatedAt",
     ],
     hidden: true,
+    useAsTitle: "version",
     components: {
       edit: {
         beforeDocumentControls: [
@@ -98,31 +99,13 @@ const Versions: CollectionConfig = {
     {
       name: "signOff",
       label: "Sign Off",
-      type: "group",
+      type: "text",
+      defaultValue: "I accept the terms outlined above.",
       admin: {
         description:
-          "This text will be shown to end users next to the I accept, I decline options.",
+          "This text will be shown to end users next to the consent checkbox.",
+        placeholder: "I accept the terms outlined above.",
       },
-      fields: [
-        {
-          name: "accept",
-          label: "Accept",
-          type: "text",
-          defaultValue: "I accept the terms outlined above.",
-          admin: {
-            placeholder: "I accept the terms outlined above.",
-          },
-        },
-        {
-          name: "decline",
-          label: "Decline",
-          type: "text",
-          defaultValue: "I decline the terms outlined above.",
-          admin: {
-            placeholder: "I decline the terms outlined above.",
-          },
-        },
-      ],
     },
     {
       name: "publishedAt",
