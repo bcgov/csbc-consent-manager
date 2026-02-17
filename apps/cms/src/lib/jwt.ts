@@ -7,14 +7,24 @@ interface ExternalJWTPayload {
   family_name: string;
 }
 
-const issuer = process.env.OIDC_ISSUER!;
-const jwksUri = `${issuer}/protocol/openid-connect/certs`;
-const JWKS = createRemoteJWKSet(new URL(jwksUri));
+let jwks: ReturnType<typeof createRemoteJWKSet>;
+
+function getJWKS() {
+  if (!jwks) {
+    const issuer = process.env.OIDC_ISSUER;
+    if (!issuer) throw new Error("OIDC_ISSUER is not set");
+    jwks = createRemoteJWKSet(
+      new URL(`${issuer}/protocol/openid-connect/certs`),
+    );
+  }
+  return jwks;
+}
 
 export async function verifyExternalJWT(
   token: string,
 ): Promise<ExternalJWTPayload> {
-  const { payload } = await jwtVerify(token, JWKS, {
+  const issuer = process.env.OIDC_ISSUER;
+  const { payload } = await jwtVerify(token, getJWKS(), {
     issuer,
   });
 
