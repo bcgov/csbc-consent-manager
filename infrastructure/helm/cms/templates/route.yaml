@@ -1,0 +1,19 @@
+{{- if .Values.route.enabled }}
+apiVersion: route.openshift.io/v1
+kind: Route
+metadata:
+  name: {{ .Values.route.name | default (include "cms.fullname" .) }}
+  labels:
+    {{- include "cms.labels" . | nindent 4 }}
+spec:
+  host: {{ .Values.route.host }}
+  port:
+    targetPort: http
+  tls:
+    termination: edge
+    insecureEdgeTerminationPolicy: Redirect
+  to:
+    kind: Service
+    name: {{ include "cms.fullname" . }}
+    weight: 100
+{{- end }}

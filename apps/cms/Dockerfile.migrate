@@ -1,0 +1,32 @@
+FROM node:24-alpine AS base
+
+# Install dependencies only when needed
+FROM base AS deps
+RUN apk add --no-cache libc6-compat
+WORKDIR /app
+
+# Copy root workspace files
+COPY package.json package-lock.json ./
+COPY apps/cms/package.json ./apps/cms/package.json
+
+RUN npm ci
+
+# Migration image
+FROM base AS runner
+WORKDIR /app
+
+COPY --from=deps /app/node_modules ./node_modules
+COPY --from=deps /app/apps/cms/node_modules ./apps/cms/node_modules
+COPY package.json package-lock.json turbo.json ./
+COPY apps/cms ./apps/cms
+
+# Install the correct sharp prebuilt binary for Alpine (linux-musl)
+RUN npm install --os=linux --libc=musl sharp --workspace=apps/cms
+
+# OpenShift compatibility
+RUN chgrp -R 0 /app && \
+    chmod -R g=u /app
+
+USER 1001
+
+CMD ["npx", "--workspace=apps/cms", "payload", "migrate"]

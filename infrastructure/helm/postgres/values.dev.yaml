@@ -1,0 +1,32 @@
+image:
+  repository: postgres
+  tag: "18-alpine"
+  pullPolicy: IfNotPresent
+
+replicas: 1
+
+auth:
+  database: csbc-consent-manager
+  username: csbc-consent-manager
+  existingSecret: csbc-consent-manager-postgres-credentials
+  secretKeys:
+    password: password
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 256Mi
+  limits:
+    cpu: 500m
+    memory: 512Mi
+
+storage:
+  size: 1Gi
+  storageClass: ""
+
+service:
+  port: 5432
+
+config:
+  maxConnections: "50"
+  sharedBuffers: "128MB"

@@ -1,0 +1,51 @@
+nameOverride: csbc-consent-manager-cms
+
+image:
+  repository: ghcr.io/bcgov/csbc-consent-manager-cms
+  tag: "latest"
+  pullPolicy: Always
+
+migrate:
+  image:
+    repository: ghcr.io/bcgov/csbc-consent-manager-cms-migrate
+    tag: "latest"
+    pullPolicy: Always
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+
+replicas: 1
+
+auth:
+  existingSecret: csbc-consent-manager-cms-credentials
+  secretKeys:
+    databaseUri: database-uri
+    payloadSecret: payload-secret
+    oidcClientId: oidc-client-id
+    oidcClientSecret: oidc-client-secret
+
+oidc:
+  issuer: ""
+
+publicUrl: ""
+consentApiUrl: ""
+
+service:
+  port: 3000
+
+route:
+  enabled: true
+  name: csbc-consent-manager-dev
+  host: csbc-consent-manager-dev.apps.gold.devops.gov.bc.ca
+
+resources:
+  requests:
+    cpu: 100m
+    memory: 256Mi
+  limits:
+    cpu: 500m
+    memory: 512Mi

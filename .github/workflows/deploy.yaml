@@ -1,0 +1,111 @@
+name: Build & Deploy CMS
+
+on:
+  push:
+    branches:
+      - develop
+      - main
+    tags:
+      - "v*"
+
+permissions:
+  packages: write
+  contents: read
+
+env:
+  REGISTRY: ghcr.io
+  CMS_IMAGE: ghcr.io/${{ github.repository_owner }}/csbc-consent-manager-cms
+  MIGRATE_IMAGE: ghcr.io/${{ github.repository_owner }}/csbc-consent-manager-cms-migrate
+  HELM_RELEASE: csbc-consent-manager-cms
+
+jobs:
+  # --- Resolve environment name & image tag from the trigger ---
+  resolve:
+    runs-on: ubuntu-latest
+    outputs:
+      environment: ${{ steps.env.outputs.environment }}
+      image_tag: ${{ steps.env.outputs.image_tag }}
+    steps:
+      - name: Determine environment and image tag
+        id: env
+        run: |
+          if [[ "${{ github.ref_type }}" == "tag" ]]; then
+            echo "environment=prod" >> "$GITHUB_OUTPUT"
+            echo "image_tag=${GITHUB_REF_NAME}" >> "$GITHUB_OUTPUT"
+          elif [[ "${{ github.ref_name }}" == "main" ]]; then
+            echo "environment=test" >> "$GITHUB_OUTPUT"
+            echo "image_tag=${GITHUB_SHA::7}" >> "$GITHUB_OUTPUT"
+          else
+            echo "environment=dev" >> "$GITHUB_OUTPUT"
+            echo "image_tag=${GITHUB_SHA::7}" >> "$GITHUB_OUTPUT"
+          fi
+
+  # --- Build images & deploy to the resolved environment ---
+  deploy:
+    needs: resolve
+    runs-on: ubuntu-latest
+    environment: ${{ needs.resolve.outputs.environment }}
+
+    steps:
+      - name: Check environment is configured
+        run: |
+          if [[ -z "${{ vars.OC_SERVER }}" ]]; then
+            echo "::warning::OC_SERVER is not configured for the '${{ needs.resolve.outputs.environment }}' environment — skipping deploy."
+            exit 1
+          fi
+
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # --- Build & push container images ---
+      - name: Log in to ghcr.io
+        uses: docker/login-action@v3
+        with:
+          registry: ${{ env.REGISTRY }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Build & push CMS image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: apps/cms/Dockerfile
+          push: true
+          tags: ${{ env.CMS_IMAGE }}:${{ needs.resolve.outputs.image_tag }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      - name: Build & push CMS migrate image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: apps/cms/Dockerfile.migrate
+          push: true
+          tags: ${{ env.MIGRATE_IMAGE }}:${{ needs.resolve.outputs.image_tag }}
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+
+      # --- Deploy to OpenShift via Helm ---
+      - name: Install oc CLI
+        uses: redhat-actions/openshift-tools-installer@v1
+        with:
+          oc: "4"
+
+      - name: Log in to OpenShift
+        run: |
+          oc login --token="${{ secrets.OC_TOKEN }}" \
+                   --server="${{ vars.OC_SERVER }}"
+
+      - name: Helm upgrade
+        run: |
+          helm upgrade --install ${{ env.HELM_RELEASE }} \
+            infrastructure/helm/cms \
+            -f infrastructure/helm/cms/values.${{ needs.resolve.outputs.environment }}.yaml \
+            --set image.tag=${{ needs.resolve.outputs.image_tag }} \
+            --set migrate.image.tag=${{ needs.resolve.outputs.image_tag }} \
+            --set oidc.issuer=${{ vars.OIDC_ISSUER }} \
+            --labels app.kubernetes.io/part-of=csbc-consent-manager \
+            -n ${{ vars.OC_NAMESPACE }}
