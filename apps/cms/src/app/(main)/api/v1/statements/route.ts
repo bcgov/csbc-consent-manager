@@ -1,12 +1,17 @@
-import { NextRequest, NextResponse } from "next/server";
-import { getPayload } from "payload";
-import config from "@payload-config";
 import { verifyExternalJWT } from "@/lib/jwt";
+import config from "@payload-config";
+import { NextRequest, NextResponse } from "next/server";
+import { getPayload, Where } from "payload";
 
 async function extractAndVerifyToken(req: NextRequest) {
   const authHeader = req.headers.get("authorization");
   if (!authHeader?.startsWith("Bearer ")) {
-    return { error: NextResponse.json({ error: "Missing or invalid Authorization header." }, { status: 401 }) };
+    return {
+      error: NextResponse.json(
+        { error: "Missing or invalid Authorization header." },
+        { status: 401 },
+      ),
+    };
   }
 
   try {
@@ -14,13 +19,23 @@ async function extractAndVerifyToken(req: NextRequest) {
     const claims = await verifyExternalJWT(token);
     return { claims };
   } catch {
-    return { error: NextResponse.json({ error: "Invalid or expired token." }, { status: 401 }) };
+    return {
+      error: NextResponse.json(
+        { error: "Invalid or expired token." },
+        { status: 401 },
+      ),
+    };
   }
 }
 
 async function findOrCreateSubject(
   payload: Awaited<ReturnType<typeof getPayload>>,
-  claims: { sub: string; email: string; given_name: string; family_name: string },
+  claims: {
+    sub: string;
+    email: string;
+    given_name: string;
+    family_name: string;
+  },
 ) {
   const existing = await payload.find({
     collection: "subjects",
@@ -84,7 +99,8 @@ export async function POST(req: NextRequest) {
     const { document, ...rest } = statement;
     return NextResponse.json(rest, { status: 201 });
   } catch (err: unknown) {
-    const message = err instanceof Error ? err.message : "Internal server error.";
+    const message =
+      err instanceof Error ? err.message : "Internal server error.";
     const status = (err as { status?: number }).status ?? 500;
     return NextResponse.json({ error: message }, { status });
   }
@@ -105,7 +121,12 @@ export async function GET(req: NextRequest) {
     });
 
     if (subject.docs.length === 0) {
-      return NextResponse.json({ docs: [], totalDocs: 0, page: 1, totalPages: 0 });
+      return NextResponse.json({
+        docs: [],
+        totalDocs: 0,
+        page: 1,
+        totalPages: 0,
+      });
     }
 
     const { searchParams } = new URL(req.url);
@@ -113,7 +134,7 @@ export async function GET(req: NextRequest) {
     const limit = parseInt(searchParams.get("limit") ?? "20", 10);
     const documentId = searchParams.get("documentId");
 
-    const where: Record<string, unknown> = {
+    const where: Where = {
       subject: { equals: subject.docs[0].id },
     };
 
@@ -132,7 +153,8 @@ export async function GET(req: NextRequest) {
 
     return NextResponse.json(statements);
   } catch (err: unknown) {
-    const message = err instanceof Error ? err.message : "Internal server error.";
+    const message =
+      err instanceof Error ? err.message : "Internal server error.";
     return NextResponse.json({ error: message }, { status: 500 });
   }
 }
