@@ -12,10 +12,10 @@ migrate:
     pullPolicy: Always
   resources:
     requests:
-      cpu: 1m
+      cpu: 50m
       memory: 64Mi
     limits:
-      cpu: 50m
+      cpu: 100m
       memory: 128Mi
 
 replicas: 1
