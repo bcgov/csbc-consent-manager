@@ -14,11 +14,11 @@ auth:
 
 resources:
   requests:
+    cpu: 25m
+    memory: 64Mi
+  limits:
     cpu: 50m
     memory: 128Mi
-  limits:
-    cpu: 100m
-    memory: 256Mi
 
 storage:
   size: 1Gi
