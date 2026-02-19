@@ -1,4 +1,3 @@
-import { randomUUID } from "crypto";
 import {
   APIError,
   CollectionAfterChangeHook,
@@ -83,16 +82,6 @@ const Documents: CollectionConfig = {
     beforeDelete: [deleteRelatedDocs],
   },
   fields: [
-    {
-      name: "id",
-      type: "text",
-      admin: {
-        hidden: true,
-      },
-      hooks: {
-        beforeValidate: [({ value }) => value ?? randomUUID()],
-      },
-    },
     {
       name: "organizationId",
       label: "Organization",

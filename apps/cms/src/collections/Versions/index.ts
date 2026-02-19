@@ -1,6 +1,5 @@
 import { CollectionConfig } from "payload";
 import { assignVersionNumber, deriveStatus } from "./hooks/beforeChange.hooks";
-import { generateId } from "./hooks/beforeValidate.hooks";
 
 const Versions: CollectionConfig = {
   slug: "versions",
@@ -47,16 +46,6 @@ const Versions: CollectionConfig = {
         components: {
           Field: "./src/components/FormLock.tsx#FormLock",
         },
-      },
-    },
-    {
-      name: "id",
-      type: "text",
-      admin: {
-        hidden: true,
-      },
-      hooks: {
-        beforeValidate: [generateId],
       },
     },
     {

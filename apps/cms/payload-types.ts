@@ -99,7 +99,7 @@ export interface Config {
     'payload-migrations': PayloadMigrationsSelect<false> | PayloadMigrationsSelect<true>;
   };
   db: {
-    defaultIDType: number;
+    defaultIDType: string;
   };
   fallbackLocale: null;
   globals: {};
@@ -255,7 +255,7 @@ export interface Subject {
  * via the `definition` "payload-kv".
  */
 export interface PayloadKv {
-  id: number;
+  id: string;
   key: string;
   data:
     | {
@@ -272,7 +272,7 @@ export interface PayloadKv {
  * via the `definition` "payload-locked-documents".
  */
 export interface PayloadLockedDocument {
-  id: number;
+  id: string;
   document?:
     | ({
         relationTo: 'contributors';
@@ -315,7 +315,7 @@ export interface PayloadLockedDocument {
  * via the `definition` "payload-preferences".
  */
 export interface PayloadPreference {
-  id: number;
+  id: string;
   user: {
     relationTo: 'users';
     value: string | User;
@@ -338,7 +338,7 @@ export interface PayloadPreference {
  * via the `definition` "payload-migrations".
  */
 export interface PayloadMigration {
-  id: number;
+  id: string;
   name?: string | null;
   batch?: number | null;
   updatedAt: string;
@@ -349,7 +349,6 @@ export interface PayloadMigration {
  * via the `definition` "contributors_select".
  */
 export interface ContributorsSelect<T extends boolean = true> {
-  id?: T;
   document?: T;
   user?: T;
   role?: T;
@@ -361,7 +360,6 @@ export interface ContributorsSelect<T extends boolean = true> {
  * via the `definition` "documents_select".
  */
 export interface DocumentsSelect<T extends boolean = true> {
-  id?: T;
   organizationId?: T;
   documentType?: T;
   name?: T;
@@ -377,7 +375,6 @@ export interface DocumentsSelect<T extends boolean = true> {
  * via the `definition` "document-types_select".
  */
 export interface DocumentTypesSelect<T extends boolean = true> {
-  id?: T;
   name?: T;
   description?: T;
   enabled?: T;
@@ -389,7 +386,6 @@ export interface DocumentTypesSelect<T extends boolean = true> {
  * via the `definition` "versions_select".
  */
 export interface VersionsSelect<T extends boolean = true> {
-  id?: T;
   document?: T;
   status?: T;
   version?: T;
@@ -405,7 +401,6 @@ export interface VersionsSelect<T extends boolean = true> {
  * via the `definition` "statements_select".
  */
 export interface StatementsSelect<T extends boolean = true> {
-  id?: T;
   document?: T;
   subject?: T;
   version?: T;

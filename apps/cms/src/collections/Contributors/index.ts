@@ -1,6 +1,5 @@
 import { CollectionConfig } from "payload";
 import { preventDuplicateContributor } from "./hooks/beforeChange.hooks";
-import { generateId } from "./hooks/beforeValidate.hooks";
 
 const Contributors: CollectionConfig = {
   slug: "contributors",
@@ -18,16 +17,6 @@ const Contributors: CollectionConfig = {
     },
   ],
   fields: [
-    {
-      name: "id",
-      type: "text",
-      admin: {
-        hidden: true,
-      },
-      hooks: {
-        beforeValidate: [generateId],
-      },
-    },
     {
       name: "document",
       label: "Document",

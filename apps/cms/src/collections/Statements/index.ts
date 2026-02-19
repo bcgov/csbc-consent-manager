@@ -1,6 +1,5 @@
 import { Access, CollectionConfig } from "payload";
 import { validateDocumentAndVersion } from "./hooks/beforeChange.hooks";
-import { generateId } from "./hooks/beforeValidate.hooks";
 
 const isAdminOrContributor: Access = async ({ req }) => {
   const user = req.user;
@@ -46,16 +45,6 @@ const Statements: CollectionConfig = {
     plural: "Consent Statements",
   },
   fields: [
-    {
-      name: "id",
-      type: "text",
-      admin: {
-        hidden: true,
-      },
-      hooks: {
-        beforeValidate: [generateId],
-      },
-    },
     {
       name: "document",
       label: "Document",
