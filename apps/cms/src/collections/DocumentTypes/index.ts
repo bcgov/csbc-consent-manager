@@ -1,11 +1,9 @@
-import { CollectionConfig, FieldAccess } from "payload";
-
-const denyUpdate: FieldAccess = () => false;
+import { CollectionConfig } from "payload";
 
 const DocumentTypes: CollectionConfig = {
   slug: "document-types",
   admin: {
-    defaultColumns: ["id", "name", "enabled", "createdAt", "updatedAt"],
+    defaultColumns: ["name", "enabled", "createdAt", "updatedAt"],
     useAsTitle: "name",
   },
   fields: [
@@ -14,14 +12,13 @@ const DocumentTypes: CollectionConfig = {
       label: "Name",
       type: "text",
       required: true,
-      access: {
-        update: denyUpdate,
-      },
+      localized: true,
     },
     {
       name: "description",
       label: "Description",
       type: "textarea",
+      localized: true,
     },
     {
       name: "enabled",

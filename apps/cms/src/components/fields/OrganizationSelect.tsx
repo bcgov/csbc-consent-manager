@@ -107,6 +107,7 @@ export const OrganizationSelect: React.FC<TextFieldClientProps> = ({
     <div className="field-type text" ref={containerRef}>
       <label className="field-label">
         {typeof field.label === "string" ? field.label : field.name}
+        {field.required && <span className="required">*</span>}
       </label>
 
       {error && (

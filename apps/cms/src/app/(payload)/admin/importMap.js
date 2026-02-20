@@ -1,5 +1,4 @@
 import { OrganizationSelect as OrganizationSelect_c75e7132eb53d214b6db81e1466cc7a2 } from '../../../../src/components/fields/OrganizationSelect.tsx'
-import { SlugFromName as SlugFromName_07a3dc3e6452e55d4910d259f62a2cc9 } from '../../../../src/components/fields/SlugFromName.tsx'
 import { FormLock as FormLock_1be952e2a801c23576c809f31860f3b1 } from '../../../../src/components/FormLock.tsx'
 import { RscEntryLexicalCell as RscEntryLexicalCell_44fe37237e0ebf4470c9990d8cb7b07e } from '@payloadcms/richtext-lexical/rsc'
 import { RscEntryLexicalField as RscEntryLexicalField_44fe37237e0ebf4470c9990d8cb7b07e } from '@payloadcms/richtext-lexical/rsc'
@@ -35,7 +34,6 @@ import { CollectionCards as CollectionCards_f9c02e79a4aed9a3924487c0cd4cafb1 } f
 
 export const importMap = {
   "./src/components/fields/OrganizationSelect.tsx#OrganizationSelect": OrganizationSelect_c75e7132eb53d214b6db81e1466cc7a2,
-  "./src/components/fields/SlugFromName.tsx#SlugFromName": SlugFromName_07a3dc3e6452e55d4910d259f62a2cc9,
   "./src/components/FormLock.tsx#FormLock": FormLock_1be952e2a801c23576c809f31860f3b1,
   "@payloadcms/richtext-lexical/rsc#RscEntryLexicalCell": RscEntryLexicalCell_44fe37237e0ebf4470c9990d8cb7b07e,
   "@payloadcms/richtext-lexical/rsc#RscEntryLexicalField": RscEntryLexicalField_44fe37237e0ebf4470c9990d8cb7b07e,

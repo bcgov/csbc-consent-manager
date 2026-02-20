@@ -44,6 +44,14 @@ export default buildConfig({
       connectionString: process.env.DATABASE_URI || "",
     },
   }),
+  localization: {
+    locales: [
+      { label: "English", code: "en" },
+      { label: "French", code: "fr" },
+    ],
+    defaultLocale: "en",
+    fallback: true,
+  },
   plugins: [keycloakPlugin],
   secret: process.env.PAYLOAD_SECRET || "",
   sharp,

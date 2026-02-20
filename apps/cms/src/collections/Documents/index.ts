@@ -106,11 +106,13 @@ const Documents: CollectionConfig = {
       label: "Name",
       type: "text",
       required: true,
+      localized: true,
     },
     {
       name: "description",
       label: "Description",
       type: "textarea",
+      localized: true,
     },
     {
       name: "publishedVersion",

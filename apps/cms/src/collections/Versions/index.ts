@@ -84,12 +84,20 @@ const Versions: CollectionConfig = {
       name: "content",
       label: "Content",
       type: "richText",
+      localized: true,
     },
     {
       name: "signOff",
       label: "Sign Off",
       type: "text",
-      defaultValue: "I accept the terms outlined above.",
+      localized: true,
+      defaultValue: ({ locale }) => {
+        if (locale === "fr") {
+          return "J'accepte les conditions énoncées ci-dessus.";
+        }
+
+        return "I accept the terms outlined above.";
+      },
       admin: {
         description:
           "This text will be shown to end users next to the consent checkbox.",

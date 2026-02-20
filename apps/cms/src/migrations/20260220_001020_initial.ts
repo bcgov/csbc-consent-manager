@@ -2,7 +2,8 @@ import { MigrateUpArgs, MigrateDownArgs, sql } from '@payloadcms/db-postgres'
 
 export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   await db.execute(sql`
-   CREATE TYPE "public"."enum_contributors_role" AS ENUM('owner', 'editor', 'viewer');
+   CREATE TYPE "public"."_locales" AS ENUM('en', 'fr');
+  CREATE TYPE "public"."enum_contributors_role" AS ENUM('owner', 'editor', 'viewer');
   CREATE TYPE "public"."enum_versions_status" AS ENUM('draft', 'published', 'archived');
   CREATE TYPE "public"."enum_statements_status" AS ENUM('granted', 'revoked');
   CREATE TYPE "public"."enum_users_role" AS ENUM('admin', 'user');
@@ -19,20 +20,32 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
   	"organization_id" varchar NOT NULL,
   	"document_type_id" uuid NOT NULL,
-  	"name" varchar NOT NULL,
-  	"description" varchar,
   	"published_version_id" uuid,
   	"updated_at" timestamp(3) with time zone DEFAULT now() NOT NULL,
   	"created_at" timestamp(3) with time zone DEFAULT now() NOT NULL
   );
   
-  CREATE TABLE "document_types" (
-  	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+  CREATE TABLE "documents_locales" (
   	"name" varchar NOT NULL,
   	"description" varchar,
+  	"id" serial PRIMARY KEY NOT NULL,
+  	"_locale" "_locales" NOT NULL,
+  	"_parent_id" uuid NOT NULL
+  );
+  
+  CREATE TABLE "document_types" (
+  	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
   	"enabled" boolean DEFAULT true,
   	"updated_at" timestamp(3) with time zone DEFAULT now() NOT NULL,
   	"created_at" timestamp(3) with time zone DEFAULT now() NOT NULL
+  );
+  
+  CREATE TABLE "document_types_locales" (
+  	"name" varchar NOT NULL,
+  	"description" varchar,
+  	"id" serial PRIMARY KEY NOT NULL,
+  	"_locale" "_locales" NOT NULL,
+  	"_parent_id" uuid NOT NULL
   );
   
   CREATE TABLE "versions" (
@@ -40,12 +53,18 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   	"document_id" uuid NOT NULL,
   	"status" "enum_versions_status" DEFAULT 'draft',
   	"version" numeric,
-  	"content" jsonb,
-  	"sign_off" varchar DEFAULT 'I accept the terms outlined above.',
   	"published_at" timestamp(3) with time zone,
   	"archived_at" timestamp(3) with time zone,
   	"updated_at" timestamp(3) with time zone DEFAULT now() NOT NULL,
   	"created_at" timestamp(3) with time zone DEFAULT now() NOT NULL
+  );
+  
+  CREATE TABLE "versions_locales" (
+  	"content" jsonb,
+  	"sign_off" varchar,
+  	"id" serial PRIMARY KEY NOT NULL,
+  	"_locale" "_locales" NOT NULL,
+  	"_parent_id" uuid NOT NULL
   );
   
   CREATE TABLE "statements" (
@@ -133,7 +152,10 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   ALTER TABLE "contributors" ADD CONSTRAINT "contributors_user_id_users_id_fk" FOREIGN KEY ("user_id") REFERENCES "public"."users"("id") ON DELETE set null ON UPDATE no action;
   ALTER TABLE "documents" ADD CONSTRAINT "documents_document_type_id_document_types_id_fk" FOREIGN KEY ("document_type_id") REFERENCES "public"."document_types"("id") ON DELETE set null ON UPDATE no action;
   ALTER TABLE "documents" ADD CONSTRAINT "documents_published_version_id_versions_id_fk" FOREIGN KEY ("published_version_id") REFERENCES "public"."versions"("id") ON DELETE set null ON UPDATE no action;
+  ALTER TABLE "documents_locales" ADD CONSTRAINT "documents_locales_parent_id_fk" FOREIGN KEY ("_parent_id") REFERENCES "public"."documents"("id") ON DELETE cascade ON UPDATE no action;
+  ALTER TABLE "document_types_locales" ADD CONSTRAINT "document_types_locales_parent_id_fk" FOREIGN KEY ("_parent_id") REFERENCES "public"."document_types"("id") ON DELETE cascade ON UPDATE no action;
   ALTER TABLE "versions" ADD CONSTRAINT "versions_document_id_documents_id_fk" FOREIGN KEY ("document_id") REFERENCES "public"."documents"("id") ON DELETE set null ON UPDATE no action;
+  ALTER TABLE "versions_locales" ADD CONSTRAINT "versions_locales_parent_id_fk" FOREIGN KEY ("_parent_id") REFERENCES "public"."versions"("id") ON DELETE cascade ON UPDATE no action;
   ALTER TABLE "statements" ADD CONSTRAINT "statements_document_id_documents_id_fk" FOREIGN KEY ("document_id") REFERENCES "public"."documents"("id") ON DELETE set null ON UPDATE no action;
   ALTER TABLE "statements" ADD CONSTRAINT "statements_subject_id_subjects_id_fk" FOREIGN KEY ("subject_id") REFERENCES "public"."subjects"("id") ON DELETE set null ON UPDATE no action;
   ALTER TABLE "statements" ADD CONSTRAINT "statements_version_id_versions_id_fk" FOREIGN KEY ("version_id") REFERENCES "public"."versions"("id") ON DELETE set null ON UPDATE no action;
@@ -156,11 +178,14 @@ export async function up({ db, payload, req }: MigrateUpArgs): Promise<void> {
   CREATE INDEX "documents_published_version_idx" ON "documents" USING btree ("published_version_id");
   CREATE INDEX "documents_updated_at_idx" ON "documents" USING btree ("updated_at");
   CREATE INDEX "documents_created_at_idx" ON "documents" USING btree ("created_at");
+  CREATE UNIQUE INDEX "documents_locales_locale_parent_id_unique" ON "documents_locales" USING btree ("_locale","_parent_id");
   CREATE INDEX "document_types_updated_at_idx" ON "document_types" USING btree ("updated_at");
   CREATE INDEX "document_types_created_at_idx" ON "document_types" USING btree ("created_at");
+  CREATE UNIQUE INDEX "document_types_locales_locale_parent_id_unique" ON "document_types_locales" USING btree ("_locale","_parent_id");
   CREATE INDEX "versions_document_idx" ON "versions" USING btree ("document_id");
   CREATE INDEX "versions_updated_at_idx" ON "versions" USING btree ("updated_at");
   CREATE INDEX "versions_created_at_idx" ON "versions" USING btree ("created_at");
+  CREATE UNIQUE INDEX "versions_locales_locale_parent_id_unique" ON "versions_locales" USING btree ("_locale","_parent_id");
   CREATE INDEX "statements_document_idx" ON "statements" USING btree ("document_id");
   CREATE INDEX "statements_subject_idx" ON "statements" USING btree ("subject_id");
   CREATE INDEX "statements_version_idx" ON "statements" USING btree ("version_id");
@@ -199,8 +224,11 @@ export async function down({ db, payload, req }: MigrateDownArgs): Promise<void>
   await db.execute(sql`
    DROP TABLE "contributors" CASCADE;
   DROP TABLE "documents" CASCADE;
+  DROP TABLE "documents_locales" CASCADE;
   DROP TABLE "document_types" CASCADE;
+  DROP TABLE "document_types_locales" CASCADE;
   DROP TABLE "versions" CASCADE;
+  DROP TABLE "versions_locales" CASCADE;
   DROP TABLE "statements" CASCADE;
   DROP TABLE "subjects" CASCADE;
   DROP TABLE "users" CASCADE;
@@ -210,6 +238,7 @@ export async function down({ db, payload, req }: MigrateDownArgs): Promise<void>
   DROP TABLE "payload_preferences" CASCADE;
   DROP TABLE "payload_preferences_rels" CASCADE;
   DROP TABLE "payload_migrations" CASCADE;
+  DROP TYPE "public"."_locales";
   DROP TYPE "public"."enum_contributors_role";
   DROP TYPE "public"."enum_versions_status";
   DROP TYPE "public"."enum_statements_status";
