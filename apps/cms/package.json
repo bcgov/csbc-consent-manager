@@ -6,7 +6,8 @@
   "scripts": {
     "dev": "next dev",
     "build": "next build",
-    "start": "next start"
+    "start": "next start",
+    "seed": "payload run ./src/scripts/seed/seed.ts"
   },
   "dependencies": {
     "@payloadcms/db-postgres": "^3.75.0",

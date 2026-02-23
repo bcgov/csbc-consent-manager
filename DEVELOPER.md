@@ -40,6 +40,16 @@ npm run dev
 
 The CMS will be available at `http://localhost:3000`.
 
+### 4. Seed the database (optional)
+
+To populate the database with initial document types, documents, and version content:
+
+```bash
+npm -w cms run seed
+```
+
+The seed script is idempotent — it skips seeding if data already exists in each collection.
+
 ---
 
 ## OpenShift Deployment
