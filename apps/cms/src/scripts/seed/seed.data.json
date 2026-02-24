@@ -1,9 +1,10 @@
 [
     {
+        "id": "d2fe71a2-1d5f-4398-88f4-4aa842faf6e3",
         "documentName": "Acknowledgement of B.C. Government\u2019s responsibilities",
         "version": 1,
-        "status": "draft",
-        "publishedAt": null,
+        "status": "published",
+        "publishedAt": "2026-02-24T17:32:36.000Z",
         "archivedAt": null,
         "content": {
             "en": {
@@ -868,10 +869,11 @@
         }
     },
     {
+        "id": "8aee44e2-171a-439c-9208-8b3d32238973",
         "documentName": "Acknowledgement of your rights and responsibilities",
         "version": 1,
-        "status": "draft",
-        "publishedAt": null,
+        "status": "published",
+        "publishedAt": "2026-02-24T17:32:36.000Z",
         "archivedAt": null,
         "content": {
             "en": {
@@ -2214,10 +2216,11 @@
         }
     },
     {
+        "id": "6c7b37a1-74e1-48ac-a52e-ca3f034401ec",
         "documentName": "Consent to Disclose Information to Concerned Parties",
         "version": 1,
-        "status": "draft",
-        "publishedAt": null,
+        "status": "published",
+        "publishedAt": "2026-02-24T17:32:36.000Z",
         "archivedAt": null,
         "content": {
             "en": {
@@ -3982,10 +3985,11 @@
         }
     },
     {
+        "id": "9e30c3be-4972-4590-b7c2-4d8696b4a183",
         "documentName": "Consent to Disclose Information to the Canada Revenue Agency (CRA)",
         "version": 1,
-        "status": "draft",
-        "publishedAt": null,
+        "status": "published",
+        "publishedAt": "2026-02-24T17:32:36.000Z",
         "archivedAt": null,
         "content": {
             "en": {
@@ -5123,10 +5127,11 @@
         }
     },
     {
+        "id": "f8966847-e852-4547-8232-eb0a0547a2dd",
         "documentName": "Medical Services Plan (MSP) Client Release",
         "version": 1,
-        "status": "draft",
-        "publishedAt": null,
+        "status": "published",
+        "publishedAt": "2026-02-24T17:32:36.000Z",
         "archivedAt": null,
         "content": {
             "en": {
@@ -6314,10 +6319,11 @@
         }
     },
     {
+        "id": "a6179c91-0bc7-47ae-a3d7-2e4bf809d1a7",
         "documentName": "(Optional) Consent to receive proactive service recommendations",
         "version": 1,
-        "status": "draft",
-        "publishedAt": null,
+        "status": "published",
+        "publishedAt": "2026-02-24T17:32:36.000Z",
         "archivedAt": null,
         "content": {
             "en": {

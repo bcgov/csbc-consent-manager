@@ -1,5 +1,6 @@
 import { CollectionConfig } from "payload";
 import { assignVersionNumber, deriveStatus } from "./hooks/beforeChange.hooks";
+import { populateSearchContent } from "./hooks/populateSearchContent";
 
 const Versions: CollectionConfig = {
   slug: "versions",
@@ -32,7 +33,7 @@ const Versions: CollectionConfig = {
     },
   },
   hooks: {
-    beforeChange: [assignVersionNumber, deriveStatus],
+    beforeChange: [assignVersionNumber, deriveStatus, populateSearchContent],
   },
   labels: {
     singular: "Document Version",
@@ -85,6 +86,14 @@ const Versions: CollectionConfig = {
       label: "Content",
       type: "richText",
       localized: true,
+    },
+    {
+      name: "searchContent",
+      type: "text",
+      localized: true,
+      admin: {
+        hidden: true,
+      },
     },
     {
       name: "signOff",

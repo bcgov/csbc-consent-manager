@@ -35,6 +35,7 @@ const configPromise = buildConfig({
   ],
   db: postgresAdapter({
     idType: "uuid",
+    allowIDOnCreate: true,
     pool: {
       connectionString: process.env.DATABASE_URI || "",
     },
@@ -59,6 +60,7 @@ const versionFixtures = JSON.parse(
 ) as VersionFixture[];
 
 interface VersionFixture {
+  id: string;
   documentName: string;
   version: number;
   status: string;
@@ -70,11 +72,13 @@ interface VersionFixture {
 
 const documentTypes = [
   {
+    id: "c690fb2f-11a4-4881-a8d7-e28ed593834e",
     name: { en: "Privacy Policy", fr: "Politique de confidentialité" },
     description: { en: "", fr: "" },
     enabled: true,
   },
   {
+    id: "b0455974-94a3-4186-98cf-677dfdc17bea",
     name: { en: "Terms of Service", fr: "Conditions d\u2019utilisation" },
     description: { en: "", fr: "" },
     enabled: true,
@@ -83,6 +87,7 @@ const documentTypes = [
 
 const documents = [
   {
+    id: "8a3d30ad-37c0-439c-8690-87bcb38e77aa",
     organizationId: "69e7c7f4-ec8c-4523-991e-5471dd0e56ab",
     documentType: "Terms of Service",
     name: {
@@ -91,6 +96,7 @@ const documents = [
     },
   },
   {
+    id: "7aaef63c-7712-4033-b8a3-73370ed43587",
     organizationId: "69e7c7f4-ec8c-4523-991e-5471dd0e56ab",
     documentType: "Terms of Service",
     name: {
@@ -99,6 +105,7 @@ const documents = [
     },
   },
   {
+    id: "2a686e18-fabd-41d3-9634-ea51d104242e",
     organizationId: "69e7c7f4-ec8c-4523-991e-5471dd0e56ab",
     documentType: "Terms of Service",
     name: {
@@ -107,6 +114,7 @@ const documents = [
     },
   },
   {
+    id: "ad727499-6b04-4598-9ab2-715139ba76f0",
     organizationId: "69e7c7f4-ec8c-4523-991e-5471dd0e56ab",
     documentType: "Terms of Service",
     name: {
@@ -115,6 +123,7 @@ const documents = [
     },
   },
   {
+    id: "d53f8b61-104a-4bac-9e68-7645695fa5f1",
     organizationId: "69e7c7f4-ec8c-4523-991e-5471dd0e56ab",
     documentType: "Terms of Service",
     name: {
@@ -123,6 +132,7 @@ const documents = [
     },
   },
   {
+    id: "d5cdf02e-9b6c-4c5c-bfe4-8337bda7bec7",
     organizationId: "69e7c7f4-ec8c-4523-991e-5471dd0e56ab",
     documentType: "Terms of Service",
     name: {
@@ -149,9 +159,10 @@ async function seed() {
     );
   } else {
     for (const dt of documentTypes) {
-      const created = await payload.create({
+      await payload.create({
         collection: "document-types",
         data: {
+          id: dt.id,
           name: dt.name.en,
           description: dt.description.en,
           enabled: dt.enabled,
@@ -161,7 +172,7 @@ async function seed() {
 
       await payload.update({
         collection: "document-types",
-        id: created.id,
+        id: dt.id,
         data: {
           name: dt.name.fr,
           description: dt.description.fr,
@@ -183,13 +194,7 @@ async function seed() {
     payload.logger.info(`Skipping documents — ${existingDocs} already exist.`);
   } else {
     // Build a lookup of document type name (en) -> id
-    const allDocTypes = await payload.find({
-      collection: "document-types",
-      limit: 100,
-      locale: "en",
-    });
-
-    const docTypeMap = new Map(allDocTypes.docs.map((dt) => [dt.name, dt.id]));
+    const docTypeMap = new Map(documentTypes.map((dt) => [dt.name.en, dt.id]));
 
     // Build a lookup of version fixtures by document name
     const versionsByDocName = new Map<string, VersionFixture[]>();
@@ -210,9 +215,10 @@ async function seed() {
 
       // Creating a document triggers the createInitialVersion hook,
       // which auto-creates a blank v1 draft.
-      const created = await payload.create({
+      await payload.create({
         collection: "documents",
         data: {
+          id: doc.id,
           organizationId: doc.organizationId,
           documentType: documentTypeId,
           name: doc.name.en,
@@ -222,7 +228,7 @@ async function seed() {
 
       await payload.update({
         collection: "documents",
-        id: created.id,
+        id: doc.id,
         data: {
           name: doc.name.fr,
         },
@@ -239,70 +245,59 @@ async function seed() {
         continue;
       }
 
-      // Find the auto-created v1 so we can update it with real content
+      // Delete the auto-created v1 so we can recreate it with an explicit ID
       const autoCreated = await payload.find({
         collection: "versions",
-        where: { document: { equals: created.id } },
+        where: { document: { equals: doc.id } },
         limit: 1,
         locale: "en",
       });
 
-      const autoCreatedVersion = autoCreated.docs[0];
+      if (autoCreated.docs[0]) {
+        await payload.delete({
+          collection: "versions",
+          id: autoCreated.docs[0].id,
+        });
+      }
 
       for (const fixture of fixtures) {
-        if (fixture.version === 1 && autoCreatedVersion) {
-          // Update the auto-created v1 with content from the fixture
-          await payload.update({
-            collection: "versions",
-            id: autoCreatedVersion.id,
-            data: {
-              content: fixture.content.en,
-              signOff: fixture.signOff.en,
-              publishedAt: fixture.publishedAt ?? undefined,
-              archivedAt: fixture.archivedAt ?? undefined,
-            },
-            locale: "en",
-          });
+        await payload.create({
+          collection: "versions",
+          data: {
+            id: fixture.id,
+            document: doc.id,
+            content: fixture.content.en,
+            signOff: fixture.signOff.en,
+            publishedAt: fixture.publishedAt ?? undefined,
+            archivedAt: fixture.archivedAt ?? undefined,
+          },
+          locale: "en",
+        });
 
-          await payload.update({
-            collection: "versions",
-            id: autoCreatedVersion.id,
-            data: {
-              content: fixture.content.fr,
-              signOff: fixture.signOff.fr,
-            },
-            locale: "fr",
-          });
+        await payload.update({
+          collection: "versions",
+          id: fixture.id,
+          data: {
+            content: fixture.content.fr,
+            signOff: fixture.signOff.fr,
+          },
+          locale: "fr",
+        });
 
+        payload.logger.info(
+          `  Created version ${fixture.version} (${fixture.id})`,
+        );
+
+        if (fixture.status === "published") {
+          await payload.update({
+            collection: "documents",
+            id: doc.id,
+            data: {
+              publishedVersion: fixture.id,
+            },
+          });
           payload.logger.info(
-            `  Updated version ${fixture.version} with content`,
-          );
-        } else {
-          // Create additional versions beyond v1
-          const newVersion = await payload.create({
-            collection: "versions",
-            data: {
-              document: created.id,
-              content: fixture.content.en,
-              signOff: fixture.signOff.en,
-              publishedAt: fixture.publishedAt ?? undefined,
-              archivedAt: fixture.archivedAt ?? undefined,
-            },
-            locale: "en",
-          });
-
-          await payload.update({
-            collection: "versions",
-            id: newVersion.id,
-            data: {
-              content: fixture.content.fr,
-              signOff: fixture.signOff.fr,
-            },
-            locale: "fr",
-          });
-
-          payload.logger.info(
-            `  Created version ${fixture.version} with content`,
+            `  Set published version on document to v${fixture.version}`,
           );
         }
       }

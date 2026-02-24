@@ -201,6 +201,7 @@ export interface Version {
     };
     [k: string]: unknown;
   } | null;
+  searchContent?: string | null;
   /**
    * This text will be shown to end users next to the consent checkbox.
    */
@@ -390,6 +391,7 @@ export interface VersionsSelect<T extends boolean = true> {
   status?: T;
   version?: T;
   content?: T;
+  searchContent?: T;
   signOff?: T;
   publishedAt?: T;
   archivedAt?: T;

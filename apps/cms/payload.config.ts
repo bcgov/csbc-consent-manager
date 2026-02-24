@@ -39,6 +39,7 @@ export default buildConfig({
     Users,
   ],
   db: postgresAdapter({
+    allowIDOnCreate: true,
     idType: "uuid",
     pool: {
       connectionString: process.env.DATABASE_URI || "",
