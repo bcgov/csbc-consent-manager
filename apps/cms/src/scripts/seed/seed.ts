@@ -5,6 +5,7 @@ import path, { resolve } from "path";
 import { buildConfig, getPayload } from "payload";
 import sharp from "sharp";
 import { fileURLToPath } from "url";
+import type { Version } from "../../../payload-types";
 import Contributors from "../../collections/Contributors";
 import Documents from "../../collections/Documents";
 import DocumentTypes from "../../collections/DocumentTypes";
@@ -66,7 +67,7 @@ interface VersionFixture {
   status: string;
   publishedAt: string | null;
   archivedAt: string | null;
-  content: { en: object; fr: object };
+  content: { en: Version["content"]; fr: Version["content"] };
   signOff: { en: string; fr: string };
 }
 
