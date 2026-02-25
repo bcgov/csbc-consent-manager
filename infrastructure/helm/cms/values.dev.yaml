@@ -42,6 +42,16 @@ route:
   name: csbc-consent-manager-dev
   host: csbc-consent-manager-dev.apps.gold.devops.gov.bc.ca
 
+seed:
+  enabled: true
+  resources:
+    requests:
+      cpu: 50m
+      memory: 128Mi
+    limits:
+      cpu: 250m
+      memory: 256Mi
+
 resources:
   requests:
     cpu: 50m

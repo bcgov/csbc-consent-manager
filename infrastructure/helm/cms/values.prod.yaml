@@ -41,6 +41,9 @@ route:
   enabled: true
   host: ""
 
+seed:
+  enabled: false
+
 resources:
   requests:
     cpu: 200m
